@@ -1,3 +1,5 @@
+# Set up
+
 ### The following steps show how to launch a simple Node.js server that will host the test page
 
 Node.js server is requred to load the .pde file, doing so straight from index.html will result in a [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing) error. There are a lot of different ways to solve this problem, but this is one of the simpler ones.
@@ -19,3 +21,13 @@ Hit CTRL-C to stop the server
 ```
 
 At this point open `localhost:8080` or `127.0.0.1:8080` in the browser.
+
+# Changelog
+
+### v0.1
+
+* Drawing triangle grid (directly in screen space)
+
+### v0
+
+* Initial processing.js set-up
