@@ -17567,10 +17567,10 @@ module.exports = function setupParser(Processing, options) {
       if (!doStroke) {
         return;
       }
-      x1 = Math.round(x1);
-      x2 = Math.round(x2);
-      y1 = Math.round(y1);
-      y2 = Math.round(y2);
+      // x1 = Math.round(x1);
+      // x2 = Math.round(x2);
+      // y1 = Math.round(y1);
+      // y2 = Math.round(y2);
       // A line is only defined if it has different start and end coordinates.
       // If they are the same, we call point instead.
       if (x1 === x2 && y1 === y2) {
