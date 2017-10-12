@@ -1,6 +1,6 @@
 var gridAngles = [0, Math.PI / 3 * 2, Math.PI / 3 * 4];
-var majorGridColors = [color(#d0985b), color(#ff4444), color(#5577dd)];
-var minorGridColors = [color(#f0b87b), color(#ff8888), color(#8899ff)];
+var majorGridColors = [color(#44aa44), color(#ff4444), color(#5577dd)];
+var minorGridColors = [color(#88bb88), color(#ff8888), color(#8899ff)];
 var gridSize = 40;
 var majorLineWidth = 2.5;
 var minorLineWidth = 2;
@@ -29,7 +29,7 @@ void draw() {
 }
 
 void drawGridLines(int index) {
-  float angle = gridAngles[index];
+  float angle = gridAngles[index] + millis() / 10000;
   // Later start with the nearest point in corner
   float lineA = sin(angle);
   float lineB = cos(angle);
