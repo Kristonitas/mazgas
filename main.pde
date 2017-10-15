@@ -1,15 +1,93 @@
 var gridAngles = [0, Math.PI / 3 * 2, Math.PI / 3 * 4];
 var majorGridColors = [color(#44aa44), color(#ff4444), color(#5577dd)];
 var minorGridColors = [color(#88bb88), color(#ff8888), color(#8899ff)];
-var gridSize = 40;
-var majorLineWidth = 2.5;
-var minorLineWidth = 2;
+var gridSize = 100;
+var majorLineWidth = 3;
+var minorLineWidth = 2.5;
 var canvasMargin = 10;
 
+class Point {
+  float x, y;
+
+  Point(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  void assertSameClass(obj) {
+    // looked what happens when using debugger
+    // this becomes something else, so to get the javascript this, need to call this.$self
+    console.assert(this.$self.constructor.name == obj.constructor.name);
+  }
+
+  void assertNumber(obj) {
+    console.assert(typeof obj == "number");
+  }
+
+  Point add (point) {
+    assertSameClass(point);
+    this.x += point.x;
+    this.y += point.y;
+    return this;
+  }
+
+  Point sub (point) {
+    assertSameClass(point);
+    this.x -= point.x;
+    this.y -= point.y;
+    return this;
+  }
+
+  Point set (x, y) {
+    assertNumber(x);
+    assertNumber(y);
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+
+  Point clone() {
+    return new this.$self.constructor(this.x, this.y);
+  }
+
+  Point dot (point) {
+    assertSameClass(point);
+    return this.x * point.x + this.y * point.y;
+  }
+
+  float length() {
+    return Math.sqrt(this.x * this.x + this.y * this.y);
+  }
+
+  void setLength(float newLength) {
+    assertNumber(newLength);
+    float len = this.length();
+    if (len == 0)
+      return this;
+
+    this.x *= newLength / len;
+    this.y *= newLength / len;
+
+    return this;
+  }
+}
+
+class WorldPoint extends Point {
+  WorldPoint(x, y) {
+    super(x, y);
+  }
+}
+
+class ScreenPoint extends Point {
+  ScreenPoint(x, y) {
+    super(x, y);
+  }
+}
 
 void setup() {
   size(600,400);
   smooth();
+  console.log(new WorldPoint(10.5, 10.3).add(new WorldPoint(100, 200)));
 }
 
 void draw() {
