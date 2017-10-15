@@ -24,6 +24,10 @@ At this point open `localhost:8080` or `127.0.0.1:8080` in the browser.
 
 # Changelog
 
+### v0.2
+
+* Added colors to grid and made it's origin follow the mouse position
+
 ### v0.1
 
 * Drawing triangle grid (directly in screen space)
