@@ -1,17 +1,29 @@
 var gridAngles = [0, Math.PI / 3 * 2, Math.PI / 3 * 4];
 var majorGridColors = [color(#44aa44), color(#ff4444), color(#5577dd)];
-var minorGridColors = [color(#88bb88), color(#ff8888), color(#8899ff)];
-var gridSize = 100;
+var minorGridColors = [color(#aaccaa), color(#ffaaaa), color(#aaccff)];
+var gridSize = 10;
 var majorLineWidth = 3;
-var minorLineWidth = 2.5;
+var minorLineWidth = 2;
 var canvasMargin = 10;
+
+var all = {};
 
 class Point {
   float x, y;
 
+  Point() {
+    this.x = 0;
+    this.y = 0;
+  }
+
   Point(x, y) {
     this.x = x;
     this.y = y;
+  }
+
+  Point(point) {
+    this.x = point.x;
+    this.y = point.y;
   }
 
   void assertSameClass(obj) {
@@ -59,7 +71,7 @@ class Point {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
-  void setLength(float newLength) {
+  Point setLength(float newLength) {
     assertNumber(newLength);
     float len = this.length();
     if (len == 0)
@@ -70,17 +82,123 @@ class Point {
 
     return this;
   }
+
+  // Clockwise
+  Point rotate(angle) {
+    assertNumber(angle);
+    this.x = Math.cos(angle) * this.x + Math.sin(angle) * this.y;
+    this.y = Math.cos(angle) * this.y - Math.sin(angle) * this.x;
+    return this;
+  }
 }
 
 class WorldPoint extends Point {
   WorldPoint(x, y) {
     super(x, y);
   }
+
+  WorldPoint (point) {
+    super(point);
+  }
+}
+
+class ViewPoint extends Point {
+  ViewPoint(x, y) {
+    super(x, y);
+  }
+
+  ViewPoint (point) {
+    super(point);
+  }
+
 }
 
 class ScreenPoint extends Point {
   ScreenPoint(x, y) {
     super(x, y);
+  }
+
+  ScreenPoint (point) {
+    super(point);
+  }
+}
+
+class Camera {
+  WorldPoint position;
+  float rotation, aspect, sizeY;
+  int screenWidth, screenHeight;
+
+  Camera(args) {
+    console.assert(args != null);
+
+    this.position = args.position || new WorldPoint;
+    this.rotation = args.rotation || 0;
+    this.aspect = args.aspect || width / height;
+    this.sizeY = args.sizeY || 1;
+
+    this.screenWidth = args.screenWidth || width;
+    this.screenHeight = args.screenHeight || height;
+  }
+
+  void assertClass(obj, cl) {
+    console.assert(obj.constructor.name == cl.name);
+  }
+
+  ViewPoint worldToView(point) {
+    assertClass(point, WorldPoint);
+
+    point = point.clone().sub(this.position).rotate(-this.rotation);
+    return new ViewPoint(
+      (point.x - this.position.x) / this.sizeY / this.screenWidth + 0.5,
+      (point.y - this.position.y) / this.sizeY / this.screenHeight + 0.5
+      );
+  }
+
+  ScreenPoint viewToScreen(point) {
+    assertClass(point, ViewPoint);
+
+    return new ScreenPoint(
+      this.screenWidth * point.x,
+      this.screenHeight * (1 - point.y)
+      );
+  }
+
+  ScreenPoint worldToScreen(point, useOffset) {
+    assertClass(point, WorldPoint);
+
+
+    if (useOffset)
+      return viewToScreen(worldToView(point));
+    else
+      return new ScreenPoint(point.x / this.sizeY, point.y / this.sizeY);
+  }
+
+  ViewPoint screenToView(point) {
+    assertClass(point, ScreenPoint);
+
+    return new ViewPoint(
+      point.x / this.screenWidth,
+      1 - point.y / this.screenHeight
+      );
+  }
+
+  WorldPoint viewToWorld(point) {
+    assertClass(point, ViewPoint);
+
+    point = new WorldPoint(
+      (point.x - 0.5) * this.screenWidth,
+      (point.y - 0.5) * this.screenHeight
+      );
+    return point.rotate(this.rotation).add(this.position);
+  }
+
+  WorldPoint screenToWorld(point, useOffset) {
+    assertClass(point, ScreenPoint);
+
+    if (useOffset)
+      return viewToWorld(screenToView(point));
+    else
+      return new WorldPoint(point.x * this.sizeY, point.y * this.sizeY);
   }
 }
 
@@ -88,9 +206,15 @@ void setup() {
   size(600,400);
   smooth();
   console.log(new WorldPoint(10.5, 10.3).add(new WorldPoint(100, 200)));
+
+  all.camera = new Camera({
+    position: new WorldPoint(),
+    sizeY: 40
+  });
 }
 
 void draw() {
+  // all.camera.sizeY = 1;
   background(255);
   stroke(50);
   fill(50);
@@ -107,27 +231,36 @@ void draw() {
 }
 
 void drawGridLines(int index) {
-  float angle = gridAngles[index] + millis() / 10000;
+  float angle = gridAngles[index];
   // Later start with the nearest point in corner
-  float lineA = sin(angle);
-  float lineB = cos(angle);
-  float maxOffset = (width + height);
+  WorldPoint wLineNormal = new WorldPoint(Math.sin(angle), Math.cos(angle));
+  WorldPoint wLineOrigin = new WorldPoint(0, 0);
+
+  // ScreenPoint sLineNormal = all.camera.worldToScreen(wLineNormal, false);
+  ScreenPoint sLineNormal = new ScreenPoint(wLineNormal);
+  ScreenPoint sLineOrigin = all.camera.worldToScreen(wLineOrigin, true);
+
+  float maxOffset = (1 + all.camera.aspect) * all.camera.sizeY;
   int maxLines = ceil(maxOffset / gridSize);
+  // debugger;
   for (int i = -maxLines; i <= maxLines; ++i) {
-    float lineC = i * gridSize + lineA * mouseX + lineB * mouseY;
-    if (lineInScreen) {
-      float midX = lineA * lineC;
-      float midY = lineB * lineC;
+    float lineC = i * gridSize / all.camera.sizeY * all.camera.screenHeight + sLineNormal.dot(sLineOrigin);
+
+    // if (lineInScreen(sLineNormal.x, sLineNormal.y, lineC)) {
+      float midX = sLineNormal.x * lineC;
+      float midY = sLineNormal.y * lineC;
       // Later do intersection with screen
-      float x1 = midX + lineB * maxOffset;
-      float y1 = midY - lineA * maxOffset;
-      float x2 = midX - lineB * maxOffset;
-      float y2 = midY + lineA * maxOffset;
+      float x1 = midX + sLineNormal.y * maxOffset * all.camera.screenHeight;
+      float y1 = midY - sLineNormal.x * maxOffset * all.camera.screenHeight;
+      float x2 = midX - sLineNormal.y * maxOffset * all.camera.screenHeight;
+      float y2 = midY + sLineNormal.x * maxOffset * all.camera.screenHeight;
 
       stroke(i == 0 ? majorGridColors[index] : minorGridColors[index]);
       strokeWeight(i == 0 ? majorLineWidth : minorLineWidth);
+
+      // debugger;
       line(x1, y1, x2, y2);
-    }
+    // }
   }
 }
 
