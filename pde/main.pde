@@ -61,9 +61,7 @@ void drawGridLines(int index) {
 
   float maxOffset = (1 + all.camera.aspect) * all.camera.sizeY;
   int maxLines = ceil(maxOffset / gridSize);
-  if (index == 0)
-    console.log(all.camera.sizeY, sLineNormal.dot(sLineOrigin));
-  // debugger;
+
   for (int i = -maxLines; i <= maxLines; ++i) {
     float lineC = i * gridSize / all.camera.sizeY * all.camera.screenHeight + sLineNormal.dot(sLineOrigin);
 
@@ -106,4 +104,10 @@ void mouseScrolled(event) {
 
 void mouseMoved() {
   canScroll = true;
+}
+
+void mouseDragged() {
+  ScreenPoint sp = new ScreenPoint(mouseX, mouseY);
+  ScreenPoint psp = new ScreenPoint(pmouseX, pmouseY);
+  all.camera.updateMousePos(sp, psp);
 }

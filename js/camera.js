@@ -79,17 +79,23 @@ class Camera {
   updateMouseWheel(screenPoint, delta) {
     let worldStart = this.screenToWorld(screenPoint, true);
 
-    this.sizeY = Math.exp(Math.log(this.sizeY) - delta * 0.02);
+    this.sizeY = Math.exp(Math.log(this.sizeY) - delta * 0.05);
     this.sizeY = MathUtils.clamp(this.sizeY, minSizeY, maxSizeY);
 
     let worldEnd = this.screenToWorld(screenPoint, true);
 
-    console.log(worldStart);
     this.position.add(worldStart.sub(worldEnd));
   }
 
   sizeLimitCoef() {
     return (this.sizeY - minSizeY) / (maxSizeY - minSizeY);
+  }
+
+  updateMousePos(currentPos, previousPos) {
+    let worldStart = this.screenToWorld(previousPos, true);
+    let worldEnd = this.screenToWorld(currentPos, true);
+
+    this.position.add(worldStart.sub(worldEnd));
   }
 }
 
