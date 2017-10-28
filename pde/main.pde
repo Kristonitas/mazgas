@@ -7,9 +7,11 @@ var minorLineWidth = 2;
 var canvasMargin = 10;
 
 var all = {};
+var mouseWheelDelta = 0;
+var sizeLimitCoef = 0;
 
 void setup() {
-  size(600,400);
+  size(1000,800);
   smooth();
   // console.log(new WorldPoint(10.5, 10.3).add(new WorldPoint(100, 200)));
 
@@ -30,6 +32,13 @@ void draw() {
   // I will need a bunch of lines
   // The lines should go off-canvas with some margins
   // Since there are 3 angles of the lines, I will have to call function for all those angles
+
+
+  if (mouseWheelDelta != 0);
+    all.camera.updateMouseWheel(mouseWheelDelta);
+  mouseWheelDelta = 0;
+
+  sizeLimitCoef = all.camera.sizeLimitCoef();
 
   for (var i = 0; i < 3; i++) {
     drawGridLines(i);
@@ -61,8 +70,10 @@ void drawGridLines(int index) {
       float x2 = midX - sLineNormal.y * maxOffset * all.camera.screenHeight;
       float y2 = midY + sLineNormal.x * maxOffset * all.camera.screenHeight;
 
-      stroke(i == 0 ? majorGridColors[index] : minorGridColors[index]);
-      strokeWeight(i == 0 ? majorLineWidth : minorLineWidth);
+      color c = i == 0 ? majorGridColors[index] : minorGridColors[index];
+      c = lerpColor(c, color(255), sizeLimitCoef * 0.5);
+      stroke(c);
+      strokeWeight((i == 0 ? majorLineWidth : minorLineWidth) * (1 - sizeLimitCoef * 0.5));
 
       // debugger;
       line(x1, y1, x2, y2);
@@ -80,4 +91,8 @@ bool lineInScreen(float a, float b, float c) {
 
 bool pointInScreen(float x, float y) {
   return !(x < -canvasMargin || x > width + canvasMargin || y < -canvasMargin || y > height + canvasMargin)
+}
+
+void mouseScrolled(event) {
+  mouseWheelDelta += mouseScroll;
 }

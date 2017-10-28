@@ -1,3 +1,6 @@
+const minSizeY = 20;
+const maxSizeY = 200;
+
 class Camera {
   WorldPoint position;
   float rotation, aspect, sizeY;
@@ -74,6 +77,15 @@ class Camera {
       return viewToWorld(screenToView(point));
     else
       return new WorldPoint(point.x * this.sizeY, point.y * this.sizeY);
+  }
+
+  void updateMouseWheel(float delta) {
+    this.sizeY = Math.exp(Math.log(this.sizeY) - delta * 0.1);
+    this.sizeY = MathUtils.clamp(this.sizeY, minSizeY, maxSizeY);
+  }
+
+  float sizeLimitCoef() {
+    return (this.sizeY - minSizeY) / (maxSizeY - minSizeY);
   }
 }
 
