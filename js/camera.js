@@ -23,8 +23,8 @@ class Camera {
 
     point = point.clone().sub(this.position).rotate(-this.rotation);
     return new ViewPoint(
-      (point.x - this.position.x) / this.sizeY / this.screenWidth + 0.5,
-      (point.y - this.position.y) / this.sizeY / this.screenHeight + 0.5
+      point.x / this.sizeY / this.aspect  + 0.5,
+      point.y / this.sizeY + 0.5
       );
   }
 
@@ -38,13 +38,13 @@ class Camera {
   }
 
   worldToScreen(point, useOffset) {
+    console.assert(useOffset != null);
     this.assertClass(point, WorldPoint);
-
 
     if (useOffset)
       return this.viewToScreen(this.worldToView(point));
     else
-      return new ScreenPoint(point.x / this.sizeY, point.y / this.sizeY);
+      return new ScreenPoint(point.x / this.sizeY * this.screenHeight , point.y / this.sizeY * this.screenHeight );
   }
 
   screenToView(point) {
@@ -60,24 +60,32 @@ class Camera {
     this.assertClass(point, ViewPoint);
 
     point = new WorldPoint(
-      (point.x - 0.5) * this.screenWidth,
-      (point.y - 0.5) * this.screenHeight
+      (point.x - 0.5) * this.sizeY * this.aspect,
+      (point.y - 0.5) * this.sizeY
       );
     return point.rotate(this.rotation).add(this.position);
   }
 
   screenToWorld(point, useOffset) {
+    console.assert(useOffset != null);
     this.assertClass(point, ScreenPoint);
 
     if (useOffset)
       return this.viewToWorld(this.screenToView(point));
     else
-      return new WorldPoint(point.x * this.sizeY, point.y * this.sizeY);
+      return new WorldPoint(point.x / this.screenHeight * this.sizeY, point.y / this.screenHeight  * this.sizeY);
   }
 
-  updateMouseWheel(delta) {
-    this.sizeY = Math.exp(Math.log(this.sizeY) - delta * 0.1);
+  updateMouseWheel(screenPoint, delta) {
+    let worldStart = this.screenToWorld(screenPoint, true);
+
+    this.sizeY = Math.exp(Math.log(this.sizeY) - delta * 0.02);
     this.sizeY = MathUtils.clamp(this.sizeY, minSizeY, maxSizeY);
+
+    let worldEnd = this.screenToWorld(screenPoint, true);
+
+    console.log(worldStart);
+    this.position.add(worldStart.sub(worldEnd));
   }
 
   sizeLimitCoef() {

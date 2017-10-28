@@ -70,6 +70,13 @@ class Point {
     return this;
   }
 
+  multiplyScalar(value) {
+    this.x *= value;
+    this.y *= value;
+
+    return this;
+  }
+
   // Clockwise
   rotate(angle) {
     this.assertNumber(angle);

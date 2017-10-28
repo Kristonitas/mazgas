@@ -1,6 +1,6 @@
 var gridAngles = [0, Math.PI / 3 * 2, Math.PI / 3 * 4];
 var majorGridColors = [color(#44aa44), color(#ff4444), color(#5577dd)];
-var minorGridColors = [color(#aaccaa), color(#ffaaaa), color(#aaccff)];
+var minorGridColors = [color(#aaeeaa), color(#ffaaaa), color(#aaccff)];
 var gridSize = 10;
 var majorLineWidth = 3;
 var minorLineWidth = 2;
@@ -9,13 +9,13 @@ var canvasMargin = 10;
 var all = {};
 var mouseWheelDelta = 0;
 var sizeLimitCoef = 0;
+var canScroll = false;
 
 void setup() {
-  size(1000,800);
+  size(1200,800);
   smooth();
-  // console.log(new WorldPoint(10.5, 10.3).add(new WorldPoint(100, 200)));
   all.camera = new Camera({
-    position: new WorldPoint(),
+    position: new WorldPoint(0, 0),
     sizeY: 40,
     screenWidth: width,
     screenHeight: height
@@ -35,8 +35,11 @@ void draw() {
   // Since there are 3 angles of the lines, I will have to call function for all those angles
 
 
-  if (mouseWheelDelta != 0);
-    all.camera.updateMouseWheel(mouseWheelDelta);
+  if (mouseWheelDelta != 0) {
+    ScreenPoint sp = new ScreenPoint(mouseX, mouseY);
+    all.camera.updateMouseWheel(sp, mouseWheelDelta);
+  }
+
   mouseWheelDelta = 0;
 
   sizeLimitCoef = all.camera.sizeLimitCoef();
@@ -53,11 +56,13 @@ void drawGridLines(int index) {
   WorldPoint wLineOrigin = new WorldPoint(0, 0);
 
   // ScreenPoint sLineNormal = all.camera.worldToScreen(wLineNormal, false);
-  ScreenPoint sLineNormal = new ScreenPoint(wLineNormal);
+  ScreenPoint sLineNormal = new ScreenPoint(wLineNormal.x, -wLineNormal.y);
   ScreenPoint sLineOrigin = all.camera.worldToScreen(wLineOrigin, true);
 
   float maxOffset = (1 + all.camera.aspect) * all.camera.sizeY;
   int maxLines = ceil(maxOffset / gridSize);
+  if (index == 0)
+    console.log(all.camera.sizeY, sLineNormal.dot(sLineOrigin));
   // debugger;
   for (int i = -maxLines; i <= maxLines; ++i) {
     float lineC = i * gridSize / all.camera.sizeY * all.camera.screenHeight + sLineNormal.dot(sLineOrigin);
@@ -95,5 +100,10 @@ bool pointInScreen(float x, float y) {
 }
 
 void mouseScrolled(event) {
-  mouseWheelDelta += mouseScroll;
+  if (canScroll)
+    mouseWheelDelta += mouseScroll;
+}
+
+void mouseMoved() {
+  canScroll = true;
 }
