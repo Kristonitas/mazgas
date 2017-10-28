@@ -14,10 +14,11 @@ void setup() {
   size(1000,800);
   smooth();
   // console.log(new WorldPoint(10.5, 10.3).add(new WorldPoint(100, 200)));
-
   all.camera = new Camera({
     position: new WorldPoint(),
-    sizeY: 40
+    sizeY: 40,
+    screenWidth: width,
+    screenHeight: height
   });
 }
 

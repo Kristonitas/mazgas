@@ -1,69 +1,66 @@
 class Point {
-  float x, y;
+  constructor(xObj, y) {
+    if (xObj == null) {
+      this.x = 0;
+      this.y = 0;
 
-  Point() {
-    this.x = 0;
-    this.y = 0;
+    } else if (y == null) {
+      this.x = xObj.x;
+      this.y = xObj.y;
+
+    } else {
+      this.x = xObj;
+      this.y = y;
+
+    }
   }
 
-  Point(x, y) {
-    this.x = x;
-    this.y = y;
+  assertSameClass(obj) {
+    console.assert(this.constructor.name == obj.constructor.name);
   }
 
-  Point(point) {
-    this.x = point.x;
-    this.y = point.y;
-  }
-
-  void assertSameClass(obj) {
-    // looked what happens when using debugger
-    // this becomes something else, so to get the javascript this, need to call this.$self
-    console.assert(this.$self.constructor.name == obj.constructor.name);
-  }
-
-  void assertNumber(obj) {
+  assertNumber(obj) {
     console.assert(typeof obj == "number");
   }
 
-  Point add (point) {
-    assertSameClass(point);
+  add (point) {
+    this.assertSameClass(point);
     this.x += point.x;
     this.y += point.y;
     return this;
   }
 
-  Point sub (point) {
-    assertSameClass(point);
+  sub (point) {
+    this.assertSameClass(point);
     this.x -= point.x;
     this.y -= point.y;
     return this;
   }
 
-  Point set (x, y) {
-    assertNumber(x);
-    assertNumber(y);
+  set (x, y) {
+    this.assertNumber(x);
+    this.assertNumber(y);
     this.x = x;
     this.y = y;
     return this;
   }
 
-  Point clone() {
-    return new this.$self.constructor(this.x, this.y);
+  clone() {
+    return new this.constructor(this.x, this.y);
   }
 
-  Point dot (point) {
-    assertSameClass(point);
+  dot (point) {
+    this.assertSameClass(point);
     return this.x * point.x + this.y * point.y;
   }
 
-  float length() {
+  length() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
-  Point setLength(float newLength) {
-    assertNumber(newLength);
-    float len = this.length();
+  setLength(newLength) {
+    this.assertNumber(newLength);
+    let len = this.length();
     if (len == 0)
       return this;
 
@@ -74,8 +71,8 @@ class Point {
   }
 
   // Clockwise
-  Point rotate(angle) {
-    assertNumber(angle);
+  rotate(angle) {
+    this.assertNumber(angle);
     this.x = Math.cos(angle) * this.x + Math.sin(angle) * this.y;
     this.y = Math.cos(angle) * this.y - Math.sin(angle) * this.x;
     return this;
@@ -83,33 +80,21 @@ class Point {
 }
 
 class WorldPoint extends Point {
-  WorldPoint(x, y) {
+  constructor(x, y) {
     super(x, y);
-  }
-
-  WorldPoint (point) {
-    super(point);
   }
 }
 
 class ViewPoint extends Point {
-  ViewPoint(x, y) {
+  constructor(x, y) {
     super(x, y);
-  }
-
-  ViewPoint (point) {
-    super(point);
   }
 
 }
 
 class ScreenPoint extends Point {
-  ScreenPoint(x, y) {
+  constructor(x, y) {
     super(x, y);
-  }
-
-  ScreenPoint (point) {
-    super(point);
   }
 }
 
