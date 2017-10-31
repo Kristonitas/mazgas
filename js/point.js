@@ -1,17 +1,31 @@
 class Point {
-  constructor(xObj, y) {
-    if (xObj == null) {
-      this.x = 0;
-      this.y = 0;
+  constructor() {
+    switch (arguments.length) {
+      case 0:
+        this.x = 0;
+        this.y = 0;
+        break;
 
-    } else if (y == null) {
-      this.x = xObj.x;
-      this.y = xObj.y;
+      case 1:
+        let obj = arguments[0];
+        console.assert(
+          typeof obj == 'object' &&
+          isNumber(obj.x) &&
+          isNumber(obj.y));
+        this.x = obj.x;
+        this.y = obj.y;
+        break;
 
-    } else {
-      this.x = xObj;
-      this.y = y;
+      case 2:
+        console.assert(
+          isNumber(arguments[0]) &&
+          isNumber(arguments[1]));
+        this.x = arguments[0];
+        this.y = arguments[1];
+        break;
 
+      default:
+        console.assert(false);
     }
   }
 
@@ -19,8 +33,9 @@ class Point {
     console.assert(this.constructor.name == obj.constructor.name);
   }
 
-  assertNumber(obj) {
-    console.assert(typeof obj == "number");
+  equals (point) {
+    this.assertSameClass(point);
+    return this.x == point.x && this.y == point.y;
   }
 
   add (point) {
@@ -38,15 +53,15 @@ class Point {
   }
 
   set (x, y) {
-    this.assertNumber(x);
-    this.assertNumber(y);
+    assertNumber(x);
+    assertNumber(y);
     this.x = x;
     this.y = y;
     return this;
   }
 
   clone() {
-    return new this.constructor(this.x, this.y);
+    return new this.constructor(this);
   }
 
   dot (point) {
@@ -59,7 +74,7 @@ class Point {
   }
 
   setLength(newLength) {
-    this.assertNumber(newLength);
+    assertNumber(newLength);
     let len = this.length();
     if (len == 0)
       return this;
@@ -71,6 +86,7 @@ class Point {
   }
 
   multiplyScalar(value) {
+    assertNumber(value);
     this.x *= value;
     this.y *= value;
 
@@ -79,7 +95,7 @@ class Point {
 
   // Clockwise
   rotate(angle) {
-    this.assertNumber(angle);
+    assertNumber(angle);
     this.x = Math.cos(angle) * this.x + Math.sin(angle) * this.y;
     this.y = Math.cos(angle) * this.y - Math.sin(angle) * this.x;
     return this;
@@ -87,21 +103,14 @@ class Point {
 }
 
 class WorldPoint extends Point {
-  constructor(x, y) {
-    super(x, y);
-  }
+
 }
 
 class ViewPoint extends Point {
-  constructor(x, y) {
-    super(x, y);
-  }
 
 }
 
 class ScreenPoint extends Point {
-  constructor(x, y) {
-    super(x, y);
-  }
+
 }
 

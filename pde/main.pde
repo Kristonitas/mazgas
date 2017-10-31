@@ -12,7 +12,7 @@ var sizeLimitCoef = 0;
 var canScroll = false;
 
 void setup() {
-  size(1200,800);
+  size(window.innerWidth, window.innerHeight);
   smooth();
   all.camera = new Camera({
     position: new WorldPoint(0, 0),
