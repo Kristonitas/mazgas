@@ -98,6 +98,28 @@ class Hex {
     return this;
   }
 
+  round() {
+    let q = Math.round(this.q);
+    let r = Math.round(this.r);
+    let s = Math.round(this.s);
+    let q_diff = Math.abs(q - this.q);
+    let r_diff = Math.abs(r - this.r);
+    let s_diff = Math.abs(s - this.s);
+
+    if (q_diff > r_diff && q_diff > s_diff)
+      q = -r - s;
+    else if (r_diff > s_diff)
+      r = -q - s;
+    else
+      s = -q - r;
+
+    return this;
+  }
+
+  roundClone() {
+    return new RoundHex(this);
+  }
+
   getNeighbour(direction) {
     return this.clone().add(this.constructor.direction(direction));
   }
@@ -117,6 +139,13 @@ class Hex {
 
     return this.diagonals[direction].clone();
   }
+
+  static lerp(from, to, t) {
+    return new Hex(
+      from.q + (to.q - from.q) * t,
+      from.r + (to.r - from.r) * t,
+      from.s + (to.s - from.s) * t);
+  }
 }
 
 Hex.directions = [
@@ -125,7 +154,7 @@ Hex.directions = [
   new Hex(0, -1, 1),
   new Hex(-1, 0, 1),
   new Hex(-1, 1, 0),
-  new Hex(0, 1, -1)]
+  new Hex(0, 1, -1)];
 
 Hex.diagonalDirections = [
   new Hex(2, -1, -1),
@@ -133,4 +162,18 @@ Hex.diagonalDirections = [
   new Hex(-1, -1, 2),
   new Hex(-2, 1, 1),
   new Hex(-1, 2, -1),
-  new Hex(1, 1, -2)]
+  new Hex(1, 1, -2)];
+
+class RoundHex extends Hex {
+  constructor() {
+    super(arguments);
+    assertRound();
+  }
+
+  assertRound() {
+    console.assert(
+      Number.isInteger(this.q) &&
+      Number.isInteger(this.r) &&
+      Number.isInteger(this.s));
+  }
+}
