@@ -131,13 +131,13 @@ class Hex {
   static direction(direction) {
     console.assert(direction >= 0 && direction < 6);
 
-    return this.directions[direction].clone();
+    return this.kDirections[direction].clone();
   }
 
   static diagonalDirection(direction) {
     console.assert(direction >= 0 && direction < 6);
 
-    return this.diagonals[direction].clone();
+    return this.kDiagonalDirections[direction].clone();
   }
 
   static lerp(from, to, t) {
@@ -148,7 +148,7 @@ class Hex {
   }
 }
 
-Hex.directions = [
+Hex.kDirections = [
   new Hex(1, 0, -1),
   new Hex(1, -1, 0),
   new Hex(0, -1, 1),
@@ -156,7 +156,7 @@ Hex.directions = [
   new Hex(-1, 1, 0),
   new Hex(0, 1, -1)];
 
-Hex.diagonalDirections = [
+Hex.kDiagonalDirections = [
   new Hex(2, -1, -1),
   new Hex(1, -2, 1),
   new Hex(-1, -1, 2),
