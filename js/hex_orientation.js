@@ -1,4 +1,4 @@
-class Orientation {
+class HexOrientation {
   constructor() {
     console.assert(arguments.length == 9);
     for (var i = arguments.length - 1; i >= 0; i--) {
@@ -19,12 +19,12 @@ class Orientation {
   }
 }
 
-Orientation.kPointy = new Orientation(
+HexOrientation.kPointy = new HexOrientation(
   Math.sqrt(3),     Math.sqrt(3) / 2, 0, 3 / 2,
   Math.sqrt(3) / 3, -1 / 3,           0, 2 / 3,
   0.5)
 
-Orientation.kFlat = new Orientation(
+HexOrientation.kFlat = new HexOrientation(
   3 / 2, 0, Math.sqrt(3) / 2, Math.sqrt(3),
   2 / 3, 0, -1 / 3,           Math.sqrt(3) / 3,
   0)

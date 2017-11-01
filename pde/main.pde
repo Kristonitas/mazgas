@@ -20,6 +20,14 @@ void setup() {
     screenWidth: width,
     screenHeight: height
   });
+
+  all.map = {}
+  all.map.layout = new HexLayout({
+    orientation: HexOrientation.kPointy,
+    size: new Point(1, 1),
+    origin: new Point(0, 0)
+  })
+  all.map.hexes = [new Hex()];
 }
 
 void draw() {
@@ -44,6 +52,26 @@ void draw() {
 
   sizeLimitCoef = all.camera.sizeLimitCoef();
 
+  drawGrid();
+  drawMap();
+}
+
+void mouseScrolled(event) {
+  if (canScroll)
+    mouseWheelDelta += mouseScroll;
+}
+
+void mouseMoved() {
+  canScroll = true;
+}
+
+void mouseDragged() {
+  ScreenPoint sp = new ScreenPoint(mouseX, mouseY);
+  ScreenPoint psp = new ScreenPoint(pmouseX, pmouseY);
+  all.camera.updateMousePos(sp, psp);
+}
+
+void drawGrid() {
   for (var i = 0; i < 3; i++) {
     drawGridLines(i);
   }
@@ -97,17 +125,19 @@ bool pointInScreen(float x, float y) {
   return !(x < -canvasMargin || x > width + canvasMargin || y < -canvasMargin || y > height + canvasMargin)
 }
 
-void mouseScrolled(event) {
-  if (canScroll)
-    mouseWheelDelta += mouseScroll;
+void drawMap() {
+  drawHexes();
 }
 
-void mouseMoved() {
-  canScroll = true;
-}
+void drawHexes() {
+  noStroke();
 
-void mouseDragged() {
-  ScreenPoint sp = new ScreenPoint(mouseX, mouseY);
-  ScreenPoint psp = new ScreenPoint(pmouseX, pmouseY);
-  all.camera.updateMousePos(sp, psp);
+  for (int i = 0; i < all.map.hexes.length; ++i) {
+    let hex = all.map.hexes[i];
+    let wHexPos = new WorldPoint(all.map.layout.hexToPoint(hex));
+    let sHexPos = all.camera.worldToScreen(wHexPos, true);
+
+    fill(0);
+    ellipse(sHexPos.x, sHexPos.y, 20, 20);
+  }
 }

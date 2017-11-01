@@ -10,8 +10,8 @@ class HexLayout {
       let M = this.orientation;
       let size = this.size;
       let origin = this.origin;
-      let x = (M.f0 * h.q + M.f1 * h.r) * size.x;
-      let y = (M.f2 * h.q + M.f3 * h.r) * size.y;
+      let x = (M.f0 * hex.q + M.f1 * hex.r) * size.x;
+      let y = (M.f2 * hex.q + M.f3 * hex.r) * size.y;
       return new Point(x + origin.x, y + origin.y);
   }
 
